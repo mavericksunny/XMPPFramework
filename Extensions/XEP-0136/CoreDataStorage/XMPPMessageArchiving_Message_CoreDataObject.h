@@ -2,6 +2,28 @@
 #import <CoreData/CoreData.h>
 #import "XMPP.h"
 
+/*public static final int STATUS_RECEIVED = 0;
+public static final int STATUS_UNSEND = 1;
+public static final int STATUS_SEND = 2;
+public static final int STATUS_SEND_FAILED = 3;
+public static final int STATUS_WAITING = 5;
+public static final int STATUS_OFFERED = 6;
+public static final int STATUS_SEND_RECEIVED = 7;
+public static final int STATUS_SEND_DISPLAYED = 8;
+*/
+
+
+typedef enum {
+    kMessageStatusReceived = 0,
+    kMessageStatusUnsend = 1,
+    kMessageStatusSend = 2,
+    kMessageStatusSendFailed = 3,
+    kMessageStatusWaiting = 4,
+    kMessageStatusOffered = 5,
+    kMessageStatusSendReceived = 6,
+    kMessageStatusSendDisplayed = 7
+    
+} MessageStatus;
 
 @interface XMPPMessageArchiving_Message_CoreDataObject : NSManagedObject
 
@@ -29,7 +51,14 @@
 
 @property (nonatomic, strong) NSDate * timestamp;
 
+@property (nonatomic, strong) NSString *fromJid;
+@property (nonatomic, strong) NSString *toJid;
+@property (nonatomic, strong) NSString *conversationJid;
 @property (nonatomic, strong) NSString * streamBareJidStr;
+@property  (nonatomic, strong) NSNumber *messageStatus;
+@property (nonatomic, strong) NSNumber *read;
+
+@property (nonatomic, assign) MessageStatus status;
 
 /**
  * This method is called immediately before the object is inserted into the managedObjectContext.

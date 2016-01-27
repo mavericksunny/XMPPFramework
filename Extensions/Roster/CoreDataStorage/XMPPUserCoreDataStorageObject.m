@@ -43,7 +43,7 @@ static const int xmppLogLevel = XMPP_LOG_LEVEL_WARN;
 @dynamic jid, primitiveJid;
 @dynamic jidStr, primitiveJidStr;
 @dynamic streamBareJidStr;
-
+@dynamic lastMessage;
 @dynamic nickname;
 @dynamic displayName, primitiveDisplayName;
 @dynamic subscription;

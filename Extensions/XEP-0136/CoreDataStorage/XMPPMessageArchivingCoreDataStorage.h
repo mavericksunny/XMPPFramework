@@ -6,6 +6,13 @@
 #import "XMPPMessageArchiving_Contact_CoreDataObject.h"
 
 
+@protocol XMPPMessageArchivingCoreDataStorageDelegate <NSObject>
+
+@optional
+-(void)didMergeAndSaveMainContext;
+
+@end
+
 @interface XMPPMessageArchivingCoreDataStorage : XMPPCoreDataStorage <XMPPMessageArchivingStorage>
 {
 	/* Inherited protected variables from XMPPCoreDataStorage
@@ -31,6 +38,7 @@
 **/
 + (instancetype)sharedInstance;
 
+@property (weak) id<XMPPMessageArchivingCoreDataStorageDelegate> delegate;
 
 @property (strong) NSString *messageEntityName;
 @property (strong) NSString *contactEntityName;
@@ -48,6 +56,7 @@
                                                       streamBareJidStr:(NSString *)streamBareJidStr
                                                   managedObjectContext:(NSManagedObjectContext *)moc;
 
+- (void)markMessagesAsRead:(NSString*)userJid;
 /* Inherited from XMPPCoreDataStorage
  * Please see the XMPPCoreDataStorage header file for extensive documentation.
  

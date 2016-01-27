@@ -22,6 +22,7 @@
 @property (nonatomic, strong) XMPPJID *jid;
 @property (nonatomic, strong) NSString * jidStr;
 @property (nonatomic, strong) NSString * streamBareJidStr;
+@property (nonatomic, strong) NSString * lastMessage;
 
 @property (nonatomic, strong) NSString * nickname;
 @property (nonatomic, strong) NSString * displayName;

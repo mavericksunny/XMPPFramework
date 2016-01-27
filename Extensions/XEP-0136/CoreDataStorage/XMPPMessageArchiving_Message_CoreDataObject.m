@@ -23,8 +23,24 @@
 @dynamic composing;
 @dynamic timestamp;
 @dynamic streamBareJidStr;
+@dynamic toJid, fromJid;
+@dynamic conversationJid;
+@dynamic messageStatus;
+@dynamic read;
 
 #pragma mark Transient message
+
+- (void) setStatus:(MessageStatus)status {
+    self.messageStatus = [NSNumber numberWithInt:status];
+}
+
+- (MessageStatus) status {
+    
+    if (self.messageStatus)
+    return [self.messageStatus intValue];
+   
+    else return kMessageStatusUnsend;
+}
 
 - (XMPPMessage *)message
 {

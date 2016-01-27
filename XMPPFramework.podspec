@@ -112,6 +112,7 @@ ss.source_files = 'Extensions/Roster/**/*.{h,m}'
 ss.dependency 'XMPPFramework/Core'
 ss.dependency 'XMPPFramework/CoreDataStorage'
 ss.prefix_header_contents = "#define HAVE_XMPP_SUBSPEC_#{name.upcase.sub('-', '_')}"
+ss.resources = [ 'Extensions/Roster/**/*.{xcdatamodel,xcdatamodeld}']
 end
 
 s.subspec 'SystemInputActivityMonitor' do |ss|
@@ -148,6 +149,7 @@ end
 
 s.subspec 'XEP-0054' do |ss|
 ss.source_files = ['Extensions/XEP-0054/**/*.{h,m}', 'Extensions/XEP-0153/XMPPvCardAvatarModule.h', 'Extensions/XEP-0082/XMPPDateTimeProfiles.h', 'Extensions/XEP-0082/NSDate+XMPPDateTimeProfiles.h']
+ss.resources = [ 'Extensions/XEP-0054/**/*.{xcdatamodel,xcdatamodeld}']
 ss.dependency 'XMPPFramework/Core'
 ss.dependency 'XMPPFramework/Roster'
 ss.prefix_header_contents = "#define HAVE_XMPP_SUBSPEC_#{name.upcase.sub('-', '_')}"
@@ -217,6 +219,7 @@ end
 
 s.subspec 'XEP-0136' do |ss|
 ss.source_files = 'Extensions/XEP-0136/**/*.{h,m}'
+ss.resources = [ 'Extensions/XEP-0136/**/*.{xcdatamodel,xcdatamodeld}']
 ss.dependency 'XMPPFramework/CoreDataStorage'
 ss.dependency 'XMPPFramework/XEP-0203'
 ss.dependency 'XMPPFramework/XEP-0085'

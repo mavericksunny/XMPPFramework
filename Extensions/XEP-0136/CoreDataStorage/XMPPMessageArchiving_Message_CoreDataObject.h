@@ -57,6 +57,7 @@ typedef enum {
 @property (nonatomic, strong) NSString * streamBareJidStr;
 @property  (nonatomic, strong) NSNumber *messageStatus;
 @property (nonatomic, strong) NSNumber *read;
+@property (nonatomic, strong) NSString *messageId;
 
 @property (nonatomic, assign) MessageStatus status;
 

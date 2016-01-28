@@ -749,7 +749,7 @@ enum XMPPRosterFlags
 		
 		if (!hasRoster)
 		{
-            [xmppRosterStorage clearAllUsersAndResourcesForXMPPStream:xmppStream];
+          //  [xmppRosterStorage clearAllUsersAndResourcesForXMPPStream:xmppStream];
             [self _setPopulatingRoster:YES];
             [multicastDelegate xmppRosterDidBeginPopulating:self withVersion:version];
 			[xmppRosterStorage beginRosterPopulationForXMPPStream:xmppStream withVersion:version];

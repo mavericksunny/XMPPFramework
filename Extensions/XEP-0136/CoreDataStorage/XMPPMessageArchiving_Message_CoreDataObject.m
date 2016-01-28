@@ -27,10 +27,13 @@
 @dynamic conversationJid;
 @dynamic messageStatus;
 @dynamic read;
+@dynamic messageId;
 
 #pragma mark Transient message
 
 - (void) setStatus:(MessageStatus)status {
+    if ([self status] == kMessageStatusSendDisplayed && status == kMessageStatusSendReceived) return;
+    
     self.messageStatus = [NSNumber numberWithInt:status];
 }
 

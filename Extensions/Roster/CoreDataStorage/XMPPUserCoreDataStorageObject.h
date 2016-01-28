@@ -13,6 +13,14 @@
 @class XMPPGroupCoreDataStorageObject;
 @class XMPPResourceCoreDataStorageObject;
 
+typedef enum {
+    ChatStateOffline = 0,
+    ChatStateActive = 1,
+    ChatStateTyping = 2,
+    ChatStatePaused = 3
+    
+} ChatState;
+
 
 @interface XMPPUserCoreDataStorageObject : NSManagedObject <XMPPUser>
 {
@@ -29,6 +37,9 @@
 @property (nonatomic, strong) NSString * subscription;
 @property (nonatomic, strong) NSString * ask;
 @property (nonatomic, strong) NSNumber * unreadMessages;
+@property (nonatomic, strong) NSNumber *state;
+
+@property (nonatomic, assign) ChatState chatState;
 
 #if TARGET_OS_IPHONE
 @property (nonatomic, strong) UIImage *photo;

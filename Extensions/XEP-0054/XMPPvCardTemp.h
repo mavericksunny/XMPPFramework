@@ -48,6 +48,9 @@ extern NSString *const kXMPPvCardTempElement;
 @property (nonatomic, strong) NSString *formattedName;
 @property (nonatomic, strong) NSString *familyName;
 @property (nonatomic, strong) NSString *givenName;
+
+@property (nonatomic, strong) NSString *imageUrl;
+
 @property (nonatomic, strong) NSString *middleName;
 @property (nonatomic, strong) NSString *prefix;
 @property (nonatomic, strong) NSString *suffix;

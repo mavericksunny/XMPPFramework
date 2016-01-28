@@ -50,7 +50,7 @@ static const int xmppLogLevel = XMPP_LOG_LEVEL_WARN;
 @dynamic ask;
 @dynamic unreadMessages;
 @dynamic photo;
-
+@dynamic state;
 @dynamic section, primitiveSection;
 @dynamic sectionName, primitiveSectionName;
 @dynamic sectionNum, primitiveSectionNum;
@@ -58,6 +58,15 @@ static const int xmppLogLevel = XMPP_LOG_LEVEL_WARN;
 @dynamic groups;
 @dynamic primaryResource;
 @dynamic resources;
+
+- (void)setChatState:(ChatState)chatState {
+    self.state = [NSNumber numberWithInt:chatState];
+}
+
+- (ChatState) chatState {
+    
+    return [self.state intValue];
+}
 
 - (XMPPJID *)jid
 {

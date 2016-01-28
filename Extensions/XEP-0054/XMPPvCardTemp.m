@@ -99,6 +99,16 @@ NSString *const kXMPPvCardTempElement = @"vCard";
 #pragma mark -
 #pragma mark Identification Types
 
+-(NSString*) imageUrl {
+   return [self elementForName:@"IMAGEURL"];
+}
+
+-(void) setImageUrl:(NSString *)imageUrl {
+    
+    NSXMLElement *elem = [self elementForName:@"IMAGEURL"];
+    [elem setStringValue:imageUrl];
+}
+
 
 - (NSDate *)bday {
 	NSDate *bday = nil;

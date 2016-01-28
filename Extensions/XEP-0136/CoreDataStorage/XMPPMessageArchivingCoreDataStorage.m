@@ -3,7 +3,8 @@
 #import "XMPPLogging.h"
 #import "NSXMLElement+XEP_0203.h"
 #import "XMPPMessage+XEP_0085.h"
-
+#import "XMPPMessage+XEP_0184.h"
+#import "XMPPMessage+XEP_0333.h"
 #if ! __has_feature(objc_arc)
 #warning This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
 #endif
@@ -332,6 +333,61 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
 	return [super configureWithParent:aParent queue:queue];
 }
 
+- (void)markMessage: (NSString*) messageID status: (MessageStatus) status{
+    [self scheduleBlock:^{
+        
+        if (messageID != nil) {
+        NSManagedObjectContext *moc = [self managedObjectContext];
+
+        NSEntityDescription *messageEntity = [self messageEntity:moc];
+        
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"messageId == %@",messageID];
+        
+        NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+        fetchRequest.entity = messageEntity;
+        fetchRequest.predicate = predicate;
+        NSError *error = nil;
+        NSArray *messages = [moc executeFetchRequest:fetchRequest error:&error];
+            
+            if ([messages count] > 0 ) {
+                XMPPMessageArchiving_Message_CoreDataObject *dbMessage = [messages firstObject];
+                if ([dbMessage isOutgoing]) {
+                    
+                [dbMessage setStatus:status];
+                NSLog(@"DB MESSAGE IS: %@",dbMessage);
+                [dbMessage didUpdateObject];       // Override hook
+                [self didUpdateMessage:dbMessage];
+                }
+            }
+        }
+    }];
+}
+
+- (void)markPreviousMessagesAsDisplayed: (NSString*) userJid {
+    
+    [self scheduleBlock:^{
+        NSManagedObjectContext *moc = [self managedObjectContext];
+        
+        NSEntityDescription *messageEntity = [self messageEntity:moc];
+        
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"conversationJid like %@ && outgoing == YES && messageStatus == %@"
+                                  ,userJid, [NSNumber numberWithInt:kMessageStatusSendReceived]];
+        
+        NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+        fetchRequest.entity = messageEntity;
+        fetchRequest.predicate = predicate;
+        NSError *error = nil;
+        NSArray *messages = [moc executeFetchRequest:fetchRequest error:&error];
+        
+        for (XMPPMessageArchiving_Message_CoreDataObject *object in messages) {
+            object.read = [NSNumber numberWithBool:true];
+            object.status = kMessageStatusSendDisplayed;
+        }
+        
+    }];
+
+}
+
 - (void)archiveMessage:(XMPPMessage *)message outgoing:(BOOL)isOutgoing
             xmppStream:(XMPPStream *)xmppStream markAsUnRead: (BOOL) markUnRead {
     // Message should either have a body, or be a composing notification
@@ -346,15 +402,35 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
         // Check to see if it has a chat state (composing, paused, etc).
         
         isComposing = [message hasComposingChatState];
+        if (isComposing) return;
+
         if (!isComposing)
         {
+            //ORDER IS IMPORTANT
+            
+            if ([message hasDisplayedChatMarker]) {
+            
+                [self markMessage:[message chatMarkerID] status:kMessageStatusSendDisplayed];
+                [self markPreviousMessagesAsDisplayed:[[message from] bare]];
+                return;
+                
+            }
+
             if ([message hasChatState])
             {
                 // Message has non-composing chat state.
                 // So if there is a current composing message in the database,
                 // then we need to delete it.
                 shouldDeleteComposingMessage = YES;
+                return;
             }
+            
+             if ([message hasReceiptResponse]) {
+                [self markMessage:[message receiptResponseID] status:kMessageStatusSendReceived];
+                 return;
+            }
+            
+            
             else
             {
                 // Message has no body and no chat state.
@@ -404,8 +480,10 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
                          insertIntoManagedObjectContext:nil];
                 
                 didCreateNewArchivedMessage = YES;
-                
-                archivedMessage.read = [NSNumber numberWithBool:!markUnRead];
+                if (isOutgoing == YES) {
+                    archivedMessage.read = [NSNumber numberWithBool:YES];
+                }
+                else archivedMessage.read = [NSNumber numberWithBool:!markUnRead];
             }
             
             archivedMessage.message = message;
@@ -430,12 +508,25 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
             archivedMessage.streamBareJidStr = [myJid bare];
             
             NSDate *timestamp = [message delayedDeliveryDate];
+            
             if (timestamp)
                 archivedMessage.timestamp = timestamp;
-            else
+            
+            else if ([[message parent] isKindOfClass:[NSXMLElement class]]) {
+                
+                NSXMLElement *element = (NSXMLElement*) [message parent];
+               timestamp = [element delayedDeliveryDate];
+                archivedMessage.timestamp = timestamp;
+            }
+            
+            
+             if (timestamp == nil || (isOutgoing == false && [timestamp compare:[NSDate date]] == NSOrderedDescending))
                 archivedMessage.timestamp = [[NSDate alloc] init];
             
             archivedMessage.thread = [[message elementForName:@"thread"] stringValue];
+            
+            archivedMessage.messageId = [[message attributeForName:@"id"] stringValue];
+
             archivedMessage.isOutgoing = isOutgoing;
             archivedMessage.isComposing = isComposing;
             

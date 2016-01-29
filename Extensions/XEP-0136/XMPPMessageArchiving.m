@@ -2,7 +2,8 @@
 #import "XMPPFramework.h"
 #import "XMPPLogging.h"
 #import "NSNumber+XMPP.h"
-
+#import "NSXMLElement+XEP_0203.h"
+#import "XMPPMessageArchiving_Message_CoreDataObject.h"
 #if ! __has_feature(objc_arc)
 #warning This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
 #endif
@@ -408,6 +409,16 @@
 	return NO;
 }
 
+- (void)xmppStream:(XMPPStream *)sender didFailToSendMessage:(XMPPMessage *)message error:(NSError *)error {
+    if ([self shouldArchiveMessage:message outgoing:YES xmppStream:sender]) {
+        
+        [xmppMessageArchivingStorage archiveMessage:message outgoing:NO useClientTimeStamp:YES markAsUnRead:YES xmppStream:sender
+                                             status: [NSNumber numberWithInt:kMessageStatusSendFailed]];
+
+    }
+}
+
+
 - (void)xmppStream:(XMPPStream *)sender didSendMessage:(XMPPMessage *)message
 {
 	XMPPLogTrace();
@@ -415,6 +426,7 @@
 	if ([self shouldArchiveMessage:message outgoing:YES xmppStream:sender])
 	{
 		[xmppMessageArchivingStorage archiveMessage:message outgoing:YES xmppStream:sender];
+        
 	}
 }
 
@@ -424,7 +436,12 @@
 	
 	if ([self shouldArchiveMessage:message outgoing:NO xmppStream:sender])
 	{
-		[xmppMessageArchivingStorage archiveMessage:message outgoing:NO xmppStream:sender];
+        
+        if ([[message delayedDeliveryDate] compare:[NSDate date]] == NSOrderedAscending) {
+            [xmppMessageArchivingStorage archiveMessage:message outgoing:NO useClientTimeStamp:YES markAsUnRead:YES xmppStream:sender];
+        }
+        
+		else [xmppMessageArchivingStorage archiveMessage:message outgoing:NO xmppStream:sender];
 	}
 }
 

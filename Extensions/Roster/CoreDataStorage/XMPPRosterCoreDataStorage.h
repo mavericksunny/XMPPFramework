@@ -68,6 +68,11 @@
                                    xmppStream:(XMPPStream *)stream
                          managedObjectContext:(NSManagedObjectContext *)moc;
 
+- (XMPPUserCoreDataStorageObject *)userForJIDString:(NSString *)jid
+                                         xmppStream:(XMPPStream *)stream
+                               managedObjectContext:(NSManagedObjectContext *)moc;
+
+
 - (XMPPResourceCoreDataStorageObject *)resourceForJID:(XMPPJID *)jid
 										   xmppStream:(XMPPStream *)stream
                                  managedObjectContext:(NSManagedObjectContext *)moc;

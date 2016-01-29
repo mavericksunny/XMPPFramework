@@ -3,6 +3,12 @@
 
 #define _XMPP_MESSAGE_ARCHIVING_H
 
+@protocol XMPPMessageArchivingDelegate <NSObject>
+
+- (void)xmppMessageArchivingDidSaveMessage:(XMPPMessage*)message;
+
+@end
+
 @protocol XMPPMessageArchivingStorage;
 
 /**
@@ -25,6 +31,7 @@
 - (id)initWithMessageArchivingStorage:(id <XMPPMessageArchivingStorage>)storage dispatchQueue:(dispatch_queue_t)queue;
 
 @property (readonly, strong) id <XMPPMessageArchivingStorage> xmppMessageArchivingStorage;
+@property (weak) id <XMPPMessageArchivingDelegate> delegate;
 
 /**
  * XEP-0136 Message Archiving outlines a complex protocol for:
@@ -99,6 +106,15 @@
 /**
  * 
 **/
+
+- (void)archiveMessage:(XMPPMessage *)message outgoing:(BOOL)isOutgoing useClientTimeStamp:(BOOL)useClientTimeStamp
+          markAsUnRead: (BOOL) markUnRead
+            xmppStream:(XMPPStream *)xmppStream status: (NSNumber*) status;
+
+- (void)archiveMessage:(XMPPMessage *)message outgoing:(BOOL)isOutgoing useClientTimeStamp:(BOOL)useClientTimeStamp
+          markAsUnRead: (BOOL) markUnRead
+            xmppStream:(XMPPStream *)xmppStream;
+
 - (void)archiveMessage:(XMPPMessage *)message outgoing:(BOOL)isOutgoing xmppStream:(XMPPStream *)stream;
 
 @optional

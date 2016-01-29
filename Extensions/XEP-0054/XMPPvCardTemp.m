@@ -100,7 +100,10 @@ NSString *const kXMPPvCardTempElement = @"vCard";
 #pragma mark Identification Types
 
 -(NSString*) imageUrl {
-   return [self elementForName:@"IMAGEURL"];
+    if ([self elementForName:@"IMAGEURL"] != nil)
+   return [[self elementForName:@"IMAGEURL"]stringValue];
+    
+    return nil;
 }
 
 -(void) setImageUrl:(NSString *)imageUrl {

@@ -48,7 +48,7 @@ static XMPPRosterCoreDataStorage *sharedInstance;
 	[super commonInit];
 	
 	// This method is invoked by all public init methods of the superclass
-    autoRemovePreviousDatabaseFile = YES;
+    autoRemovePreviousDatabaseFile = NO;
 	autoRecreateDatabaseFile = YES;
     
 	rosterPopulationSet = [[NSMutableSet alloc] init];
@@ -188,38 +188,46 @@ static XMPPRosterCoreDataStorage *sharedInstance;
 	return [self resourceForJID:myJID xmppStream:stream managedObjectContext:moc];
 }
 
+- (XMPPUserCoreDataStorageObject *)userForJIDString:(NSString *)jid
+                                   xmppStream:(XMPPStream *)stream
+                         managedObjectContext:(NSManagedObjectContext *)moc
+{
+    // This is a public method, so it may be invoked on any thread/queue.
+    
+    XMPPLogTrace();
+    
+    if (jid == nil) return nil;
+    if (moc == nil) return nil;
+    
+    
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"XMPPUserCoreDataStorageObject"
+                                              inManagedObjectContext:moc];
+    
+    NSPredicate *predicate;
+    if (stream == nil)
+        predicate = [NSPredicate predicateWithFormat:@"jidStr == %@", jid];
+    else
+        predicate = [NSPredicate predicateWithFormat:@"jidStr == %@ AND streamBareJidStr == %@",
+                     jid, [[self myJIDForXMPPStream:stream] bare]];
+    
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    [fetchRequest setEntity:entity];
+    [fetchRequest setPredicate:predicate];
+    [fetchRequest setIncludesPendingChanges:YES];
+    [fetchRequest setFetchLimit:1];
+    
+    NSArray *results = [moc executeFetchRequest:fetchRequest error:nil];
+    
+    return (XMPPUserCoreDataStorageObject *)[results lastObject];
+}
+
 - (XMPPUserCoreDataStorageObject *)userForJID:(XMPPJID *)jid
                                    xmppStream:(XMPPStream *)stream
                          managedObjectContext:(NSManagedObjectContext *)moc
 {
 	// This is a public method, so it may be invoked on any thread/queue.
 	
-	XMPPLogTrace();
-	
-	if (jid == nil) return nil;
-	if (moc == nil) return nil;
-	
-	NSString *bareJIDStr = [jid bare];
-	
-	NSEntityDescription *entity = [NSEntityDescription entityForName:@"XMPPUserCoreDataStorageObject"
-	                                          inManagedObjectContext:moc];
-	
-	NSPredicate *predicate;
-	if (stream == nil)
-		predicate = [NSPredicate predicateWithFormat:@"jidStr == %@", bareJIDStr];
-	else
-		predicate = [NSPredicate predicateWithFormat:@"jidStr == %@ AND streamBareJidStr == %@",
-					 bareJIDStr, [[self myJIDForXMPPStream:stream] bare]];
-	
-	NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-	[fetchRequest setEntity:entity];
-	[fetchRequest setPredicate:predicate];
-	[fetchRequest setIncludesPendingChanges:YES];
-	[fetchRequest setFetchLimit:1];
-	
-	NSArray *results = [moc executeFetchRequest:fetchRequest error:nil];
-	
-	return (XMPPUserCoreDataStorageObject *)[results lastObject];
+    return [self userForJIDString:[jid bare] xmppStream:stream managedObjectContext:moc];
 }
 
 - (XMPPResourceCoreDataStorageObject *)resourceForJID:(XMPPJID *)jid
@@ -266,7 +274,7 @@ static XMPPRosterCoreDataStorage *sharedInstance;
 	
 	[self scheduleBlock:^{
 		
-		[rosterPopulationSet addObject:[NSNumber xmpp_numberWithPtr:(__bridge void *)stream]];
+		//[rosterPopulationSet addObject:[NSNumber xmpp_numberWithPtr:(__bridge void *)stream]];
     
 		// Clear anything already in the roster core data store.
 		// 
@@ -291,12 +299,12 @@ static XMPPRosterCoreDataStorage *sharedInstance;
 			[fetchRequest setPredicate:predicate];
 		}
 		
-		NSArray *allUsers = [moc executeFetchRequest:fetchRequest error:nil];
-		
-		for (XMPPUserCoreDataStorageObject *user in allUsers)
-		{
-			[moc deleteObject:user];
-		}
+//		NSArray *allUsers = [moc executeFetchRequest:fetchRequest error:nil];
+//		
+//		for (XMPPUserCoreDataStorageObject *user in allUsers)
+//		{
+//			[moc deleteObject:user];
+//		}
 		
 		[XMPPGroupCoreDataStorageObject clearEmptyGroupsInManagedObjectContext:moc];
 	}];

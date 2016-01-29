@@ -749,7 +749,7 @@ enum XMPPRosterFlags
 		
 		if (!hasRoster)
 		{
-          //  [xmppRosterStorage clearAllUsersAndResourcesForXMPPStream:xmppStream];
+           // [xmppRosterStorage clearAllUsersAndResourcesForXMPPStream:xmppStream];
             [self _setPopulatingRoster:YES];
             [multicastDelegate xmppRosterDidBeginPopulating:self withVersion:version];
 			[xmppRosterStorage beginRosterPopulationForXMPPStream:xmppStream withVersion:version];
@@ -941,19 +941,19 @@ enum XMPPRosterFlags
 	
 	XMPPLogTrace();
 	
-    if([self autoClearAllUsersAndResources])
-    {
-        [xmppRosterStorage clearAllUsersAndResourcesForXMPPStream:xmppStream];
-    }
-    else
-    {
-        [xmppRosterStorage clearAllResourcesForXMPPStream:xmppStream];
-    }
-	
-	[self _setRequestedRoster:NO];
-	[self _setHasRoster:NO];
-	
-	[earlyPresenceElements removeAllObjects];
+   // if([self autoClearAllUsersAndResources])
+//    {
+//        [xmppRosterStorage clearAllUsersAndResourcesForXMPPStream:xmppStream];
+//    }
+//    else
+//    {
+//        [xmppRosterStorage clearAllResourcesForXMPPStream:xmppStream];
+//    }
+//	
+//	[self _setRequestedRoster:NO];
+//	[self _setHasRoster:NO];
+//	
+//	[earlyPresenceElements removeAllObjects];
 }
 
 #ifdef _XMPP_MUC_H

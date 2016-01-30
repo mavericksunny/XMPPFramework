@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
 
+
 #if TARGET_OS_IPHONE
     #import <UIKit/UIKit.h>
 #else
@@ -38,6 +39,9 @@ typedef enum {
 @property (nonatomic, strong) NSString * ask;
 @property (nonatomic, strong) NSNumber * unreadMessages;
 @property (nonatomic, strong) NSNumber *state;
+
+@property (nonatomic, strong) id lastMessageObject;
+
 
 @property (nonatomic, assign) ChatState chatState;
 

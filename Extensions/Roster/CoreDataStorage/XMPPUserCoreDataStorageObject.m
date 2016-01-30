@@ -59,6 +59,8 @@ static const int xmppLogLevel = XMPP_LOG_LEVEL_WARN;
 @dynamic primaryResource;
 @dynamic resources;
 
+@synthesize lastMessageObject;
+
 - (void)setChatState:(ChatState)chatState {
     self.state = [NSNumber numberWithInt:chatState];
 }

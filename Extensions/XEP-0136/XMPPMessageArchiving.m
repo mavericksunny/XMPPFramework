@@ -412,7 +412,7 @@
 - (void)xmppStream:(XMPPStream *)sender didFailToSendMessage:(XMPPMessage *)message error:(NSError *)error {
     if ([self shouldArchiveMessage:message outgoing:YES xmppStream:sender]) {
         
-        [xmppMessageArchivingStorage archiveMessage:message outgoing:NO useClientTimeStamp:YES markAsUnRead:YES xmppStream:sender
+        [xmppMessageArchivingStorage archiveMessage:message outgoing:NO useClientTimeStamp:YES markAsUnRead:NO xmppStream:sender
                                              status: [NSNumber numberWithInt:kMessageStatusSendFailed]];
 
     }

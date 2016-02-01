@@ -58,6 +58,9 @@
  
 */
 
+- (XMPPUserCoreDataStorageObject*) insertUserInLocalRosterStorage: (NSString*) contactJid stream: (XMPPStream*) stream;
+
+
 - (XMPPUserCoreDataStorageObject *)myUserForXMPPStream:(XMPPStream *)stream
                             managedObjectContext:(NSManagedObjectContext *)moc;
 

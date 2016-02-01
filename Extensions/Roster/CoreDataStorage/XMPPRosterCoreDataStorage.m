@@ -320,6 +320,7 @@ static XMPPRosterCoreDataStorage *sharedInstance;
 	}];
 }
 
+
 - (void)handleRosterItem:(NSXMLElement *)itemSubElement xmppStream:(XMPPStream *)stream
 {
 	XMPPLogTrace();
@@ -400,6 +401,28 @@ static XMPPRosterCoreDataStorage *sharedInstance;
 		
 		[user updateWithPresence:presence streamBareJidStr:streamBareJidStr];
 	}];
+}
+
+- (XMPPUserCoreDataStorageObject*) insertUserInLocalRosterStorage: (NSString*) contactJid stream: (XMPPStream*) stream {
+    
+    
+    XMPPJID *jid = [[XMPPJID jidWithString:contactJid] bareJID];
+    
+    NSManagedObjectContext *moc = [self mainThreadManagedObjectContext];
+
+    
+    XMPPUserCoreDataStorageObject *user = [self userForJID:jid xmppStream:stream managedObjectContext:moc];
+    
+    if (user == nil)
+        {
+            NSString *streamBareJidStr = [[self myJIDForXMPPStream:stream] bare];
+            
+            [XMPPUserCoreDataStorageObject insertInManagedObjectContext:moc withJID:jid streamBareJidStr:streamBareJidStr];
+        }
+    
+    return user;
+    
+
 }
 
 - (BOOL)userExistsWithJID:(XMPPJID *)jid xmppStream:(XMPPStream *)stream

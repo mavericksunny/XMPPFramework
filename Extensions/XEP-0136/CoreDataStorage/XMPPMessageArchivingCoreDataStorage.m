@@ -198,6 +198,20 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
 #pragma mark Public API
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+-(void)insertMessage:(XMPPMessage*) xmlMessage {
+    
+    NSXMLElement *xmpElement = (NSXMLElement*) xmlMessage;
+    if ([xmlMessage attributeForName:@"id"] != nil) {
+        NSString *messageId = [xmlMessage attributeForName:@"id"];
+       XMPPMessageArchiving_Message_CoreDataObject  *message = [self messageWithMessageId:messageId
+                                                                     managedObjectContext:[self mainThreadManagedObjectContext]];
+        
+        if (message == nil) {
+            
+        }
+    }
+}
+
 - (XMPPMessageArchiving_Contact_CoreDataObject *)contactForMessage:(XMPPMessageArchiving_Message_CoreDataObject *)msg
 {
 	// Potential override hook
@@ -214,6 +228,35 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
 	return [self contactWithBareJidStr:[contactJid bare]
 	                  streamBareJidStr:[streamJid bare]
 	              managedObjectContext:moc];
+}
+
+- (XMPPMessageArchiving_Message_CoreDataObject *)latestSentmessageWithMessageId:(NSString *)contactJid
+    completionBlock:(void (^) (XMPPMessageArchiving_Message_CoreDataObject*) ) completionBlock {
+    
+    [self scheduleBlock:^{
+        
+        NSEntityDescription *entity = [self messageEntity:[self managedObjectContext]];
+        NSPredicate *predicate;
+        predicate = [NSPredicate predicateWithFormat:@"conversationJid like %@ AND outgoing == NO", contactJid];
+        NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+        [fetchRequest setEntity:entity];
+        [fetchRequest setFetchLimit:1];
+        [fetchRequest setPredicate:predicate];
+        
+        NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"timestamp" ascending:NO];
+
+        [fetchRequest setSortDescriptors:@[sortDescriptor]];
+        
+        NSError *error = nil;
+        NSArray *results = [[self managedObjectContext] executeFetchRequest:fetchRequest error:&error];
+        
+
+        XMPPMessageArchiving_Message_CoreDataObject *message = [results firstObject];
+        
+        if (message != nil) {
+            completionBlock(message);
+        }
+    }];
 }
 
 - (XMPPMessageArchiving_Message_CoreDataObject *)messageWithMessageId:(NSString *)messageId  managedObjectContext:(NSManagedObjectContext *)moc{

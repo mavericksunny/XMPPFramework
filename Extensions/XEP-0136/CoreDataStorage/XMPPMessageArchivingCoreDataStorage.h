@@ -57,6 +57,12 @@
                                                   managedObjectContext:(NSManagedObjectContext *)moc;
 
 - (void)markMessagesAsRead:(NSString*)userJid;
+
+-(void)insertMessage:(XMPPMessage*) xmlMessage;
+
+- (XMPPMessageArchiving_Message_CoreDataObject *)latestSentmessageWithMessageId:(NSString *)contactJid
+                                                                completionBlock:(void (^) (XMPPMessageArchiving_Message_CoreDataObject*) ) completionBlock;
+
 /* Inherited from XMPPCoreDataStorage
  * Please see the XMPPCoreDataStorage header file for extensive documentation.
  

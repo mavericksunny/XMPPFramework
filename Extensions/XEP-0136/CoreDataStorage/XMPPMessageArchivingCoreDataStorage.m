@@ -22,7 +22,7 @@
 	NSString *messageEntityName;
 	NSString *contactEntityName;
 }
-
+@property (copy) void (^copyBlock) (XMPPMessageArchiving_Message_CoreDataObject*);
 @end
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -124,12 +124,19 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
 
 - (void)willInsertMessage:(XMPPMessageArchiving_Message_CoreDataObject *)message
 {
+    if ([[self delegate] respondsToSelector:@selector(didUpdateMessage:)]) {
+        [[self delegate]didUpdateMessage:message];
+    }
+
 	// Override hook
 }
 
 - (void)didUpdateMessage:(XMPPMessageArchiving_Message_CoreDataObject *)message
 {
-	// Override hook
+    if ([[self delegate] respondsToSelector:@selector(didUpdateMessage:)]) {
+        [[self delegate]didUpdateMessage:message];
+    }
+
 }
 
 - (void)willDeleteMessage:(XMPPMessageArchiving_Message_CoreDataObject *)message
@@ -140,11 +147,13 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
 - (void)willInsertContact:(XMPPMessageArchiving_Contact_CoreDataObject *)contact
 {
 	// Override hook
+   
 }
 
 - (void)didUpdateContact:(XMPPMessageArchiving_Contact_CoreDataObject *)contact
 {
 	// Override hook
+    
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -230,7 +239,7 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
 	              managedObjectContext:moc];
 }
 
-- (XMPPMessageArchiving_Message_CoreDataObject *)latestSentmessageWithMessageId:(NSString *)contactJid
+- (void) latestSentmessageWithMessageId:(NSString *)contactJid
     completionBlock:(void (^) (XMPPMessageArchiving_Message_CoreDataObject*) ) completionBlock {
     
     [self scheduleBlock:^{
@@ -694,11 +703,12 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
                     contact.streamBareJidStr = archivedMessage.streamBareJidStr;
                     contact.bareJid = archivedMessage.bareJid;
                     
-                    if (contact.mostRecentMessageTimestamp != nil)
-                    contact.mostRecentMessageTimestamp = archivedMessage.timestamp;
-                    contact.mostRecentMessageBody = archivedMessage.body;
-                    contact.mostRecentMessageOutgoing = @(isOutgoing);
-                    
+                    if (contact.mostRecentMessageTimestamp == nil ||(contact.mostRecentMessageTimestamp != nil
+                                                                     && [contact.mostRecentMessageTimestamp compare:archivedMessage.timestamp] == NSOrderedAscending)){
+                        contact.mostRecentMessageTimestamp = archivedMessage.timestamp;
+                       contact.mostRecentMessageBody = archivedMessage.body;
+                       contact.mostRecentMessageOutgoing = @(isOutgoing);
+                    }
                     XMPPLogVerbose(@"New contact: %@", contact);
                     
                     if (didCreateNewContact) // [contact isInserted] doesn't seem to work

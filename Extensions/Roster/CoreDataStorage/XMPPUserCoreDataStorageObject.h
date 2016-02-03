@@ -32,6 +32,7 @@ typedef enum {
 @property (nonatomic, strong) NSString * jidStr;
 @property (nonatomic, strong) NSString * streamBareJidStr;
 @property (nonatomic, strong) NSString * lastMessage;
+@property (nonatomic, strong) NSDate * lastMessageDate;
 
 @property (nonatomic, strong) NSString * nickname;
 @property (nonatomic, strong) NSString * displayName;
@@ -51,6 +52,7 @@ typedef enum {
 @property (nonatomic, strong) NSImage *photo;
 #endif
 
+@property (nonatomic, strong) NSString *imageUrl;
 @property (nonatomic, assign) NSInteger section;
 @property (nonatomic, strong) NSString * sectionName;
 @property (nonatomic, strong) NSNumber * sectionNum;

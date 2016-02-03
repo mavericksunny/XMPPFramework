@@ -39,7 +39,7 @@ static const int xmppLogLevel = XMPP_LOG_LEVEL_WARN;
 #pragma mark Accessors
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
+@dynamic lastMessageDate;
 @dynamic jid, primitiveJid;
 @dynamic jidStr, primitiveJidStr;
 @dynamic streamBareJidStr;
@@ -60,6 +60,7 @@ static const int xmppLogLevel = XMPP_LOG_LEVEL_WARN;
 @dynamic resources;
 
 @synthesize lastMessageObject;
+@dynamic imageUrl;
 
 - (void)setChatState:(ChatState)chatState {
     self.state = [NSNumber numberWithInt:chatState];
@@ -285,7 +286,24 @@ static const int xmppLogLevel = XMPP_LOG_LEVEL_WARN;
 	}
 	
 	self.jid = jid;
-	self.nickname = [item attributeStringValueForName:@"name"];
+    
+    NSString *delimitName = [item attributeStringValueForName:@"name"];
+    
+    if (delimitName != nil) {
+        NSArray *splitArray = [delimitName componentsSeparatedByString:@"$$$"];
+        if ([splitArray count] > 0) {
+            if ([[splitArray objectAtIndex:0] isEqualToString:@"undefined"] == false)
+            self.nickname = [splitArray objectAtIndex:0];
+            
+            if ([splitArray count] > 1) {
+                
+                if ([[splitArray objectAtIndex:1] isEqualToString:@"undefined"] == false)
+                    self.imageUrl = [splitArray objectAtIndex:1];
+            }
+        }
+    }
+    
+//	self.nickname = [item attributeStringValueForName:@"name"];
 	
 	self.displayName = self.nickname ? : jidStr;
 	

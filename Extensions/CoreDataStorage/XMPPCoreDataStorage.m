@@ -967,8 +967,9 @@ static NSMutableSet *databaseFileNames;
 	
 	OSAtomicIncrement32(&pendingRequests);
 	dispatch_async(storageQueue, ^{ @autoreleasepool {
-		
-		block();
+        
+        block();
+        
 		[self maybeSave:OSAtomicDecrement32(&pendingRequests)];
 	}});
 }

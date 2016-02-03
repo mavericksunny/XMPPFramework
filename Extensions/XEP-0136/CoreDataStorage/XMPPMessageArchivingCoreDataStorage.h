@@ -11,6 +11,8 @@
 @optional
 -(void)didMergeAndSaveMainContext;
 
+-(void)didUpdateMessage:(XMPPMessageArchiving_Message_CoreDataObject*)message;
+
 @end
 
 @interface XMPPMessageArchivingCoreDataStorage : XMPPCoreDataStorage <XMPPMessageArchivingStorage>
@@ -60,7 +62,7 @@
 
 -(void)insertMessage:(XMPPMessage*) xmlMessage;
 
-- (XMPPMessageArchiving_Message_CoreDataObject *)latestSentmessageWithMessageId:(NSString *)contactJid
+- (void)latestSentmessageWithMessageId:(NSString *)contactJid
                                                                 completionBlock:(void (^) (XMPPMessageArchiving_Message_CoreDataObject*) ) completionBlock;
 
 /* Inherited from XMPPCoreDataStorage

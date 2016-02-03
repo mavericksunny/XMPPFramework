@@ -403,8 +403,26 @@ static XMPPRosterCoreDataStorage *sharedInstance;
 	}];
 }
 
-- (XMPPUserCoreDataStorageObject*) insertUserInLocalRosterStorage: (NSString*) contactJid stream: (XMPPStream*) stream {
+- (void) updateUserInLocalRosterStorage:(NSString*) contactJid lastMessage: (NSString*)lastMessage date: (NSDate*)date stream: (XMPPStream*) stream {
     
+    [self scheduleBlock:^{
+       
+        XMPPJID *jid = [[XMPPJID jidWithString:contactJid] bareJID];
+
+        NSManagedObjectContext *moc = [self managedObjectContext];
+        XMPPUserCoreDataStorageObject *user = [self userForJID:jid xmppStream:stream managedObjectContext:moc];
+        if (user != nil) {
+            if (user.lastMessageDate == nil || [user.lastMessageDate compare:date] == NSOrderedAscending){
+            user.lastMessage = lastMessage;
+            user.lastMessageDate = date;
+            }
+        }
+
+    }];
+}
+
+- (XMPPUserCoreDataStorageObject*) insertUserInLocalRosterStorage: (NSString*) contactJid name: (NSString*)name stream: (XMPPStream*) stream {
+
     
     XMPPJID *jid = [[XMPPJID jidWithString:contactJid] bareJID];
     
@@ -417,8 +435,12 @@ static XMPPRosterCoreDataStorage *sharedInstance;
         {
             NSString *streamBareJidStr = [[self myJIDForXMPPStream:stream] bare];
             
-            [XMPPUserCoreDataStorageObject insertInManagedObjectContext:moc withJID:jid streamBareJidStr:streamBareJidStr];
+           user = [XMPPUserCoreDataStorageObject insertInManagedObjectContext:moc withJID:jid streamBareJidStr:streamBareJidStr];
         }
+    
+    user.nickname = name;
+    user.displayName = name;
+    [user.managedObjectContext save:nil];
     
     return user;
     

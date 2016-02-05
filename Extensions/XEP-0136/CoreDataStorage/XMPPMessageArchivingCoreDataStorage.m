@@ -239,6 +239,42 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
 	              managedObjectContext:moc];
 }
 
+
+-(void)insertUpdateTemplateMessage: (NSString*) contactJid status: (NSString*) status stream: (XMPPStream*) stream{
+    [self scheduleBlock:^{
+        NSEntityDescription *entity = [self messageEntity:[self managedObjectContext]];
+        NSPredicate *predicate;
+        predicate = [NSPredicate predicateWithFormat:@"conversationJid like %@ AND messageType == %@",
+                     [NSNumber numberWithInt:kMessageTypeEnquiry]];
+        NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+        [fetchRequest setEntity:entity];
+        [fetchRequest setFetchLimit:1];
+        [fetchRequest setPredicate:predicate];
+        
+        
+        NSError *error = nil;
+        NSArray *results = [[self managedObjectContext] executeFetchRequest:fetchRequest error:&error];
+        
+        
+        XMPPMessageArchiving_Message_CoreDataObject *message = [results firstObject];
+
+        if (message == nil) {
+            
+            message = (XMPPMessageArchiving_Message_CoreDataObject *)
+            [[NSManagedObject alloc] initWithEntity:[self messageEntity:[self managedObjectContext]]
+                     insertIntoManagedObjectContext:nil];
+            
+            message.read = [NSNumber numberWithBool:YES];
+            message.messageType = [NSNumber numberWithInt:kMessageTypeEnquiry];
+            message.messageId = [stream generateUUID];
+            message.toJid = contactJid;
+            message.fromJid = [stream myJID].bare;
+            message.timestamp = [NSDate dateWithTimeIntervalSince1970:0];
+            message.conversationJid = contactJid;
+        }
+    }];
+}
+
 - (void) latestSentmessageWithMessageId:(NSString *)contactJid
     completionBlock:(void (^) (XMPPMessageArchiving_Message_CoreDataObject*) ) completionBlock {
     

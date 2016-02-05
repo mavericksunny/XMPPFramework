@@ -27,7 +27,7 @@ typedef enum {
 {
 	NSInteger section;
 }
-
+@property(nonatomic, strong) NSNumber *chatEnabled;
 @property (nonatomic, strong) XMPPJID *jid;
 @property (nonatomic, strong) NSString * jidStr;
 @property (nonatomic, strong) NSString * streamBareJidStr;

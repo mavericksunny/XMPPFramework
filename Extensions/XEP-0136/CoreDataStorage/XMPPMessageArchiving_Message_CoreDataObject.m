@@ -28,6 +28,7 @@
 @dynamic messageStatus;
 @dynamic read;
 @dynamic messageId;
+@dynamic messageType;
 
 #pragma mark Transient message
 
@@ -44,6 +45,21 @@
    
     else return kMessageStatusUnsend;
 }
+
+- (void) setTypeOfMessage:(MessageType)typeOfMessage
+{
+    self.messageType = [NSNumber numberWithInt:typeOfMessage];
+}
+
+- (MessageType) typeOfMessage {
+    
+    if (self.messageType)
+        return [self.messageType intValue];
+    
+    return kMessageTypeChat;
+    
+}
+
 
 - (XMPPMessage *)message
 {

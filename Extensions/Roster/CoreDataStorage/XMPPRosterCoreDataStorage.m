@@ -435,7 +435,9 @@ static XMPPRosterCoreDataStorage *sharedInstance;
         {
             NSString *streamBareJidStr = [[self myJIDForXMPPStream:stream] bare];
             
-           user = [XMPPUserCoreDataStorageObject insertInManagedObjectContext:moc withJID:jid streamBareJidStr:streamBareJidStr];
+      
+            user = [XMPPUserCoreDataStorageObject insertInManagedObjectContext:moc withJID:jid streamBareJidStr:streamBareJidStr];
+            user.chatEnabled = [NSNumber numberWithBool:NO];
         }
     
     user.nickname = name;

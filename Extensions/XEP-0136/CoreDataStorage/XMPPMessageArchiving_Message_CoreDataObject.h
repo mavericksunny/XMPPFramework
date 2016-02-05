@@ -25,6 +25,13 @@ typedef enum {
     
 } MessageStatus;
 
+
+typedef enum {
+    kMessageTypeChat = 0,
+    kMessageTypeEnquiry = 1,
+    
+} MessageType;
+
 @interface XMPPMessageArchiving_Message_CoreDataObject : NSManagedObject
 
 @property (nonatomic, strong) XMPPMessage * message;  // Transient (proper type, not on disk)
@@ -58,8 +65,10 @@ typedef enum {
 @property  (nonatomic, strong) NSNumber *messageStatus;
 @property (nonatomic, strong) NSNumber *read;
 @property (nonatomic, strong) NSString *messageId;
+@property (nonatomic, strong) NSNumber *messageType;
 
 @property (nonatomic, assign) MessageStatus status;
+@property (nonatomic, assign) MessageType typeOfMessage;
 
 /**
  * This method is called immediately before the object is inserted into the managedObjectContext.

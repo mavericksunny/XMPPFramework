@@ -54,7 +54,7 @@ static const int xmppLogLevel = XMPP_LOG_LEVEL_WARN;
 @dynamic section, primitiveSection;
 @dynamic sectionName, primitiveSectionName;
 @dynamic sectionNum, primitiveSectionNum;
-
+@dynamic chatEnabled;
 @dynamic groups;
 @dynamic primaryResource;
 @dynamic resources;

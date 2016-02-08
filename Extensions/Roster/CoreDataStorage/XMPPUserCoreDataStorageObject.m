@@ -304,7 +304,7 @@ static const int xmppLogLevel = XMPP_LOG_LEVEL_WARN;
     }
     
 //	self.nickname = [item attributeStringValueForName:@"name"];
-	
+    self.chatEnabled = [NSNumber numberWithBool:YES];
 	self.displayName = self.nickname ? : jidStr;
 	
 	self.subscription = [item attributeStringValueForName:@"subscription"];

@@ -241,10 +241,12 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
 
 
 -(void)insertUpdateTemplateMessage: (NSString*) contactJid status: (NSString*) status stream: (XMPPStream*) stream{
-    [self scheduleBlock:^{
-        NSEntityDescription *entity = [self messageEntity:[self managedObjectContext]];
+    //[self scheduleBlock:^{
+        
+        NSManagedObjectContext *moc = [self mainThreadManagedObjectContext];
+        NSEntityDescription *entity = [self messageEntity:moc];
         NSPredicate *predicate;
-        predicate = [NSPredicate predicateWithFormat:@"conversationJid like %@ AND messageType == %@",
+        predicate = [NSPredicate predicateWithFormat:@"conversationJid like %@ AND messageType == %@",contactJid,
                      [NSNumber numberWithInt:kMessageTypeEnquiry]];
         NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
         [fetchRequest setEntity:entity];
@@ -253,7 +255,7 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
         
         
         NSError *error = nil;
-        NSArray *results = [[self managedObjectContext] executeFetchRequest:fetchRequest error:&error];
+        NSArray *results = [moc executeFetchRequest:fetchRequest error:&error];
         
         
         XMPPMessageArchiving_Message_CoreDataObject *message = [results firstObject];
@@ -261,7 +263,7 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
         if (message == nil) {
             
             message = (XMPPMessageArchiving_Message_CoreDataObject *)
-            [[NSManagedObject alloc] initWithEntity:[self messageEntity:[self managedObjectContext]]
+            [[NSManagedObject alloc] initWithEntity:[self messageEntity:moc]
                      insertIntoManagedObjectContext:nil];
             
             message.read = [NSNumber numberWithBool:YES];
@@ -271,8 +273,14 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
             message.fromJid = [stream myJID].bare;
             message.timestamp = [NSDate dateWithTimeIntervalSince1970:0];
             message.conversationJid = contactJid;
+            message.composing = [NSNumber numberWithBool:NO];
+            [self willInsertMessage:message];
+
+            [moc insertObject:message];
+            [moc save:nil];
         }
-    }];
+        
+  //  }];
 }
 
 - (void) latestSentmessageWithMessageId:(NSString *)contactJid

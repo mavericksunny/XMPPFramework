@@ -91,6 +91,43 @@ static XMPPRosterCoreDataStorage *sharedInstance;
 #pragma mark Utilities
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+- (void) removeAndReset {
+    [self scheduleBlock:^{
+        
+        NSManagedObjectContext *moc = [self managedObjectContext];
+        
+        NSEntityDescription *entity = [NSEntityDescription entityForName:@"XMPPUserCoreDataStorageObject"
+                                                  inManagedObjectContext:moc];
+        
+        NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+        [fetchRequest setEntity:entity];
+        
+        NSArray *allUsers = [moc executeFetchRequest:fetchRequest error:nil];
+
+        for (XMPPUserCoreDataStorageObject *user in allUsers)
+        {
+            [moc deleteObject:user];
+        
+        }
+        
+        
+        entity = [NSEntityDescription entityForName:@"XMPPResourceCoreDataStorageObject"
+                             inManagedObjectContext:moc];
+        
+         fetchRequest = [[NSFetchRequest alloc] init];
+        [fetchRequest setEntity:entity];
+        
+        NSArray *allResources = [moc executeFetchRequest:fetchRequest error:nil];
+        
+        for (XMPPResourceCoreDataStorageObject *resource in allResources)
+        {
+            [moc deleteObject:resource];
+            
+        }
+
+    }];
+}
+
 - (void)_clearAllResourcesForXMPPStream:(XMPPStream *)stream
 {
 	XMPPLogTrace();

@@ -950,9 +950,8 @@ enum XMPPRosterFlags
 //        [xmppRosterStorage clearAllResourcesForXMPPStream:xmppStream];
 //    }
 //	
-//	[self _setRequestedRoster:NO];
-//	[self _setHasRoster:NO];
-//	
+	[self _setRequestedRoster:NO];
+//
 //	[earlyPresenceElements removeAllObjects];
 }
 

@@ -458,6 +458,40 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
 	return [super configureWithParent:aParent queue:queue];
 }
 
+- (void)removeAndReset {
+    
+    [self scheduleBlock:^{
+        NSManagedObjectContext *moc = [self managedObjectContext];
+        NSEntityDescription *messageEntity = [self messageEntity:moc];
+        NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+        fetchRequest.entity = messageEntity;
+
+        NSError *error = nil;
+        NSArray *messages = [moc executeFetchRequest:fetchRequest error:&error];
+        if ([messages count] > 0) {
+            
+            for (XMPPMessageArchiving_Message_CoreDataObject *message in messages) {
+                [moc deleteObject:message];
+            }
+        }
+        
+        
+        
+        NSEntityDescription *contactEntity = [self contactEntity:moc];
+        fetchRequest = [[NSFetchRequest alloc] init];
+        fetchRequest.entity = contactEntity;
+        
+        NSArray *contacts = [moc executeFetchRequest:fetchRequest error:&error];
+        if ([contacts count] > 0) {
+            
+            for (XMPPMessageArchiving_Contact_CoreDataObject *contact in contacts) {
+                [moc deleteObject:contact];
+            }
+        }
+
+    }];
+}
+
 - (void)markMessage: (NSString*) messageID status: (MessageStatus) status{
     [self scheduleBlock:^{
         

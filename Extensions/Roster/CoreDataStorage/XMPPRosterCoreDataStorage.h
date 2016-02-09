@@ -58,6 +58,8 @@
  
 */
 
+- (void) removeAndReset;
+
 - (void) updateUserInLocalRosterStorage:(NSString*) contactJid lastMessage: (NSString*)lastMessage date: (NSDate*)date stream: (XMPPStream*) stream;
 
 

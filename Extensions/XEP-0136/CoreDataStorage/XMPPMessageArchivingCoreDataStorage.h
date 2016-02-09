@@ -62,6 +62,8 @@
 
 - (void)markMessagesAsRead:(NSString*)userJid;
 
+- (void)removeAndReset;
+
 -(void)insertMessage:(XMPPMessage*) xmlMessage;
 
 - (void)latestSentmessageWithMessageId:(NSString *)contactJid

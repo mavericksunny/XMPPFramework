@@ -197,6 +197,10 @@
 	
 	NSXMLElement *match = nil;
 	
+    if ([message elementForName:@"error"] != nil) {
+        return NO;
+    }
+    
 	NSString *messageThread = [[message elementForName:@"thread"] stringValue];
 	if (messageThread)
 	{

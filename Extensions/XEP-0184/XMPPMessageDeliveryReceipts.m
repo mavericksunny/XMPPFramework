@@ -121,6 +121,8 @@
 
 - (void)xmppStream:(XMPPStream *)sender didReceiveMessage:(XMPPMessage *)message
 {
+    if ([message elementForName:@"error"] != nil)
+        return;
     if([message hasReceiptRequest])
     {        
         if(self.autoSendMessageDeliveryReceipts)

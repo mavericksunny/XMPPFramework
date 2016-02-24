@@ -687,7 +687,11 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
                 }
                 
                 archivedMessage.message = message;
-                archivedMessage.body = messageBody;
+                if (messageBody != nil) {
+                NSData *decodedData = [[NSData alloc] initWithBase64EncodedString:messageBody options:0];
+                NSString *decodedString = [[NSString alloc] initWithData:decodedData encoding:NSUTF8StringEncoding];
+                archivedMessage.body = decodedString;
+                }
                 
                 if (status) {
                     archivedMessage.status = [status intValue];

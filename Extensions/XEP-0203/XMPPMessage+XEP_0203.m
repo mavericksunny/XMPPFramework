@@ -17,9 +17,10 @@
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setFormatterBehavior:NSDateFormatterBehavior10_4];
     [dateFormatter setLocale:[[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"]];
-    [dateFormatter setDateFormat:@"yyyyMMdd'T'HH:mm:ss"];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSS"];
     [dateFormatter setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"GMT"]];
-    [delay addAttributeWithName:@"stamp" stringValue:[dateFormatter stringFromDate:[NSDate date]]];
+    NSString *dateString = [dateFormatter stringFromDate:[NSDate date]];
+    [delay addAttributeWithName:@"stamp" stringValue:[dateString stringByAppendingString:@"+00:00"]];
     [self addChild:delay];
 }
 

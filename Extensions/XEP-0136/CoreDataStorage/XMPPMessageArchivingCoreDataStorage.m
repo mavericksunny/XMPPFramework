@@ -59,6 +59,10 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
 	messageEntityName = @"XMPPMessageArchiving_Message_CoreDataObject";
 	contactEntityName = @"XMPPMessageArchiving_Contact_CoreDataObject";
     
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(managedObjectContextDidChange:)
+                                                 name:NSManagedObjectContextObjectsDidChangeNotification
+                                               object:self.mainThreadManagedObjectContext];
    }
 
 /**
@@ -813,6 +817,33 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
         }];
     }
 
+-(void)managedObjectContextDidChange: (NSNotification*) note {
+ 
+    NSSet *updatedObjects = [[note userInfo] objectForKey:NSUpdatedObjectsKey];
+    NSSet *deletedObjects = [[note userInfo] objectForKey:NSDeletedObjectsKey];
+    NSSet *insertedObjects = [[note userInfo] objectForKey:NSInsertedObjectsKey];
+    
+    if ([insertedObjects count] > 0 || [updatedObjects count] > 0) {
+        
+        for (NSManagedObject *object in insertedObjects) {
+            if ([object isKindOfClass:[XMPPMessageArchiving_Message_CoreDataObject class]]) {
+                if ([self.delegate respondsToSelector:@selector(didInsertMessage:)])
+                    [self.delegate didInsertMessage:(XMPPMessageArchiving_Message_CoreDataObject*) object];
+            }
+        }
+        
+        /*for (NSManagedObject *object in updatedObjects) {
+            if ([object isKindOfClass:[XMPPMessageArchiving_Message_CoreDataObject class]]) {
+                if ([self.delegate respondsToSelector:@selector(didUpdateMessage:)])
+                    [self.delegate didUpdateMessage:(XMPPMessageArchiving_Message_CoreDataObject*) object];
+            }
+        }*/
+        
+        if ([self.delegate respondsToSelector:@selector(didMergeAndSaveMainContext)])
+            [self.delegate didMergeAndSaveMainContext];
+
+    }
+}
 
 - (void)archiveMessage:(XMPPMessage *)message outgoing:(BOOL)isOutgoing useClientTimeStamp:(BOOL)useClientTimeStamp
           markAsUnRead: (BOOL) markUnRead
@@ -830,7 +861,5 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
 - (void)mainThreadManagedObjectContextDidMergeChanges {
     [super mainThreadManagedObjectContextDidMergeChanges];
     
-    if ([self.delegate respondsToSelector:@selector(didMergeAndSaveMainContext)])
-        [self.delegate didMergeAndSaveMainContext];
-}
+    }
 @end

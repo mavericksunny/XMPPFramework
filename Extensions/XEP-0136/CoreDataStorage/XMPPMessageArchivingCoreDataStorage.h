@@ -12,6 +12,7 @@
 -(void)didMergeAndSaveMainContext;
 
 -(void)didUpdateMessage:(XMPPMessageArchiving_Message_CoreDataObject*)message;
+-(void)didInsertMessage:(XMPPMessageArchiving_Message_CoreDataObject*)message;
 
 @end
 
